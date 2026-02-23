@@ -1,0 +1,626 @@
+<div id="jammy-schedule-root"></div>
+
+<script>
+(() => {
+  const DATA = {
+    titleChips: ["Saturday · Oct 31", "Sunday · Nov 1", "WinSport Event Centre"],
+    atAGlance: [
+      { badge: "Saturday", title: "Festival (Arena B)", desc: "Vendors, activities, stage moments, zones", meta: [{ k: "Hours", v: "10:00am – 6:00pm" }] },
+      { badge: "Saturday Night", alt: true, title: "Main Stage (Event Centre)", desc: "Concert programming block", meta: [{ k: "Doors", v: "5:00pm – 6:00pm" }, { k: "Show", v: "6:00pm – 10:00pm" }] },
+      { badge: "Sunday", title: "Festival (Arena B)", desc: "Vendors, public programs, community zones", meta: [{ k: "Hours", v: "10:00am – 7:00pm" }] },
+      { badge: "Workshops", alt: true, title: "Legacy Room", desc: "Workshops and special programming", meta: [{ k: "Focus", v: "Workshops + programs" }] }
+    ],
+    areas: [
+      { title: "Event Centre", desc: "Main Stage and concert programming blocks." },
+      { title: "Arena B", desc: "Vendor Hall, fan zones, daytime programs." },
+      { title: "Legacy Room", desc: "Workshops, panels, special programs." }
+    ],
+    schedule: {
+      sat: [
+        {
+          area: "event",
+          title: "Event Centre",
+          subtitle: "Saturday · Oct 31",
+          slots: [
+            { time: "10:30am – 12:00pm", name: "Soundcheck", tag: "Special" },
+            { time: "1:00pm – 2:00pm", name: "Random Play Dance Audition", tag: "Program" },
+            { time: "4:00pm – 5:00pm", name: "Fansign Event", tag: "Special" },
+            { time: "5:00pm – 6:00pm", name: "Doors Open", tag: "Main Stage" },
+            { time: "6:00pm – 10:00pm", name: "Artist Concert + Cover Dance Contest", tag: "Main Stage" }
+          ]
+        },
+        {
+          area: "arena",
+          title: "Arena B",
+          subtitle: "Saturday · Oct 31",
+          slots: [
+            { time: "10:00am – 6:00pm", name: "Vendor Hall + Festival Areas", tag: "All day" },
+            { time: "3:00pm – 4:30pm", name: "Cosplay Show", tag: "Showcase" },
+            { time: "All day", name: "Game Zone · Photocard Trading Zone", tag: "Zones" }
+          ]
+        },
+        {
+          area: "legacy",
+          title: "Legacy Room",
+          subtitle: "Saturday · Oct 31",
+          slots: [{ time: "Select blocks", name: "Workshops / Programs", tag: "Info" }]
+        }
+      ],
+      sun: [
+        {
+          area: "arena",
+          title: "Arena B",
+          subtitle: "Sunday · Nov 1",
+          slots: [
+            { time: "10:00am – 7:00pm", name: "Vendor Hall + Festival Areas", tag: "All day" },
+            { time: "Program blocks", name: "Random Play Dance (Public)", tag: "Program" },
+            { time: "All day", name: "Game Zone · Photocard Trading Zone", tag: "Zones" }
+          ]
+        },
+        {
+          area: "legacy",
+          title: "Legacy Room",
+          subtitle: "Sunday · Nov 1",
+          slots: [
+            { time: "10:00am – 10:45am", name: "K-Pop Dance Workshop", tag: "Workshop" },
+            { time: "11:00am – 11:45am", name: "K-Beauty & Skincare 101", tag: "Workshop" },
+            { time: "12:00pm – 12:45pm", name: "Dress Like Your Bias – Fashion Lab", tag: "Workshop" },
+            { time: "1:00pm – 2:00pm", name: "K-Trivia Battle", tag: "Program" },
+            { time: "4:00pm – 5:00pm", name: "Fan Club Meet-Up", tag: "Program" },
+            { time: "5:00pm – 6:00pm", name: "K-Pop Sing-Along", tag: "Program" },
+            { time: "8:00pm – 11:00pm", name: "K-Pop Club Night", tag: "Night" }
+          ]
+        }
+      ]
+    },
+    details: [
+      { title: "Random Play Dance", sub: "Audition Saturday · Public Sunday", body: "Jump in, follow the choreo, and vibe with the crowd. Saturday includes auditions; Sunday is open/public." },
+      { title: "Cosplay Showcase", sub: "Festival highlight block", body: "Show off your cosplay and enjoy a high-energy showcase. Lineup may shift based on programming." },
+      { title: "Fansign Event", sub: "Limited participation", body: "Limited participation. Please check the schedule above for requirements and updates." },
+      { title: "Game Zone & Photocard Zone", sub: "Drop in anytime", body: "Games, trading, decorating, and community hangouts throughout festival hours." },
+      { title: "Workshops (Legacy Room)", sub: "Smaller sessions", body: "Workshops and special programming in a quieter space. Perfect for learning and creator-style sessions." }
+    ]
+  };
+
+  const CSS = `
+  :root{
+    --bg0:#070812; --bg1:#0b0d1a;
+    --card: rgba(255,255,255,.06);
+    --stroke: rgba(255,255,255,.12);
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.68);
+    --shadow: 0 18px 60px rgba(0,0,0,.40);
+    --shadow2: 0 10px 30px rgba(0,0,0,.34);
+    --r: 22px; --r2: 18px;
+    --pad: clamp(18px, 2.2vw, 26px);
+    --max: 1120px;
+    --a1: 255, 80, 230;  /* pink */
+    --a2: 80, 200, 255;  /* blue */
+    --a3: 120, 255, 180; /* green */
+  }
+
+  #jammy-schedule-root, .jammy-schedule-root{
+    background:
+      radial-gradient(1000px 600px at 20% -10%, rgba(var(--a2),.25), transparent 60%),
+      radial-gradient(900px 560px at 110% 10%, rgba(var(--a1),.22), transparent 55%),
+      radial-gradient(900px 560px at 50% 110%, rgba(var(--a3),.12), transparent 55%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    color: var(--text);
+    border-radius: 26px;
+    overflow: hidden;
+  }
+
+  .jammy-section{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: clamp(34px, 5vw, 64px) var(--pad);
+  }
+
+  .jammy-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap: 18px; margin-bottom: 18px;
+  }
+
+  .jammy-eyebrow{
+    letter-spacing: .18em; text-transform: uppercase;
+    font-size: .72rem; color: rgba(255,255,255,.62);
+    margin: 0 0 6px 0;
+  }
+
+  .jammy-h2{
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    line-height: 1.08; margin: 0;
+  }
+
+  .jammy-h3{ font-size: 1.12rem; margin: 0 0 6px 0; }
+  .jammy-lede{ margin: 10px 0 0 0; color: var(--muted); max-width: 60ch; }
+  .jammy-muted{ color: var(--muted); }
+
+  .jammy-chips{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap: 10px; }
+  .jammy-chip{
+    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.05);
+    padding: 9px 12px; border-radius: 999px;
+    font-size: .86rem; backdrop-filter: blur(10px);
+  }
+
+  .jammy-grid-12{ display:grid; gap: 14px; grid-template-columns: repeat(12, 1fr); }
+  .jammy-span-12{ grid-column: span 12; }
+
+  .jammy-card{
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+    border-radius: var(--r);
+    box-shadow: var(--shadow2);
+    overflow:hidden;
+  }
+
+  .jammy-card-glow{ position:relative; }
+  .jammy-card-glow::before{
+    content:""; position:absolute; inset:-1px;
+    background:
+      radial-gradient(420px 220px at 20% 10%, rgba(var(--a2),.24), transparent 60%),
+      radial-gradient(420px 220px at 90% 10%, rgba(var(--a1),.22), transparent 60%);
+    opacity:.55; pointer-events:none;
+  }
+
+  .jammy-card-top{ position:relative; padding: 18px 18px 0 18px; }
+  .jammy-card-meta{ position:relative; padding: 14px 18px 18px 18px; display:grid; gap: 10px; }
+
+  .jammy-badge{
+    display:inline-flex; align-items:center; gap: 8px;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.06);
+    padding: 6px 10px; border-radius: 999px;
+    font-size: .82rem; margin-bottom: 10px; width: fit-content;
+  }
+
+  .jammy-meta{
+    display:flex; justify-content:space-between; gap: 12px;
+    border-top: 1px dashed rgba(255,255,255,.12);
+    padding-top: 10px;
+  }
+  .jammy-meta:first-child{ border-top: 0; padding-top: 0; }
+  .jammy-meta-k{ color: rgba(255,255,255,.62); }
+  .jammy-meta-v{ color: rgba(255,255,255,.90); font-weight: 600; }
+
+  .jammy-area-card{ padding: 18px; }
+  .jammy-icon{
+    width: 44px; height: 44px; border-radius: 14px;
+    display:grid; place-items:center;
+    border: 1px solid rgba(255,255,255,.14);
+    background: radial-gradient(60px 60px at 30% 20%, rgba(var(--a2),.20), transparent 60%), rgba(255,255,255,.05);
+    margin-bottom: 12px;
+  }
+  .jammy-icon svg{ width: 22px; height: 22px; opacity:.9; }
+
+  .jammy-toolbar{
+    display:flex; flex-wrap:wrap; justify-content:flex-end;
+    gap: 10px; align-items:center;
+  }
+  .jammy-divider{
+    width: 10px; height: 10px; border-radius: 999px;
+    background: rgba(255,255,255,.16);
+    margin: 0 2px;
+  }
+  .jammy-btn, .jammy-pill{
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.92);
+    padding: 10px 12px; border-radius: 999px;
+    cursor:pointer; font: inherit;
+    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    backdrop-filter: blur(10px);
+  }
+  .jammy-btn:hover, .jammy-pill:hover{
+    transform: translateY(-1px);
+    background: rgba(255,255,255,.09);
+    border-color: rgba(255,255,255,.22);
+  }
+  .jammy-active{
+    background:
+      radial-gradient(140px 60px at 20% 10%, rgba(var(--a2),.22), transparent 60%),
+      radial-gradient(140px 60px at 90% 10%, rgba(var(--a1),.20), transparent 60%),
+      rgba(255,255,255,.08) !important;
+    border-color: rgba(255,255,255,.26) !important;
+  }
+
+  .jammy-schedule-card{ padding: 18px; }
+  .jammy-timeline{ margin-top: 14px; display:grid; gap: 10px; }
+  .jammy-slot{
+    display:grid; grid-template-columns: 1fr;
+    gap: 6px; padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.12);
+  }
+  .jammy-time{ font-variant-numeric: tabular-nums; color: rgba(255,255,255,.70); font-size: .92rem; }
+  .jammy-name{ font-weight: 650; letter-spacing: .01em; }
+  .jammy-tag{
+    width: fit-content; font-size: .78rem;
+    border-radius: 999px; padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.85);
+  }
+  .jammy-hidden{ display:none !important; }
+
+  .jammy-actions{ margin-top: 18px; display:flex; flex-wrap:wrap; gap: 10px; }
+
+  .jammy-linkbtn{
+    display:inline-flex; align-items:center; justify-content:center; gap: 10px;
+    padding: 12px 14px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.20);
+    background:
+      radial-gradient(180px 60px at 20% 10%, rgba(var(--a2),.22), transparent 60%),
+      radial-gradient(180px 60px at 90% 10%, rgba(var(--a1),.20), transparent 60%),
+      rgba(255,255,255,.08);
+    color: rgba(255,255,255,.94);
+    text-decoration:none; font-weight: 700;
+    box-shadow: var(--shadow2);
+    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+  }
+  .jammy-linkbtn:hover{
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,.28);
+    background:
+      radial-gradient(220px 70px at 20% 10%, rgba(var(--a2),.26), transparent 60%),
+      radial-gradient(220px 70px at 90% 10%, rgba(var(--a1),.24), transparent 60%),
+      rgba(255,255,255,.10);
+  }
+  .jammy-linkbtn-ghost{
+    background: rgba(255,255,255,.05);
+    border-color: rgba(255,255,255,.18);
+    box-shadow: none;
+  }
+
+  .jammy-accordion{ display:grid; gap: 12px; }
+
+  .jammy-acc{
+    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.05);
+    border-radius: var(--r2);
+    overflow:hidden;
+  }
+  .jammy-acc-btn{
+    width: 100%;
+    display:grid; grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 16px;
+    cursor:pointer;
+    background: transparent;
+    color: var(--text);
+    border: 0;
+    text-align:left;
+  }
+  .jammy-acc-title{ font-weight: 750; }
+  .jammy-acc-sub{ color: var(--muted); font-size: .92rem; }
+  .jammy-acc-ico{
+    justify-self: end;
+    margin-top: -42px;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,.75);
+  }
+  .jammy-acc-panel{ padding: 0 16px 16px; color: rgba(255,255,255,.82); }
+
+  /* Responsive upgrades */
+  @media (min-width: 780px){
+    .jammy-glance > article{ grid-column: span 6; }
+    .jammy-areas > article{ grid-column: span 4; }
+    .jammy-schedgrid > article{ grid-column: span 6; }
+    .jammy-slot{
+      grid-template-columns: 160px 1fr auto;
+      align-items:center;
+    }
+    .jammy-time{ font-size: .95rem; }
+  }
+
+  @media (min-width: 1020px){
+    .jammy-schedgrid > article[data-area="event"]{ grid-column: span 7; }
+    .jammy-schedgrid > article[data-area="arena"]{ grid-column: span 5; }
+    .jammy-schedgrid > article[data-area="legacy"]{ grid-column: span 6; }
+  }
+  `;
+
+  const ICONS = {
+    event: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 10.5V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M3 10.5 12 3l9 7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+    arena: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7h16v10H4z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>`,
+    legacy: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 21V8a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M9 21v-6h6v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>`
+  };
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const el = (tag, attrs = {}, html = "") => {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v === null || v === undefined) continue;
+      if (k === "class") node.className = v;
+      else if (k === "dataset") Object.entries(v).forEach(([dk, dv]) => (node.dataset[dk] = dv));
+      else node.setAttribute(k, v);
+    }
+    node.innerHTML = html;
+    return node;
+  };
+
+  const injectCSS = () => {
+    const id = "jammy-schedule-css";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = CSS;
+    document.head.appendChild(style);
+  };
+
+  const build = () => {
+    // Root
+    let root = document.getElementById("jammy-schedule-root");
+    if (!root) {
+      // fallback: append to main or body
+      root = document.createElement("div");
+      root.className = "jammy-schedule-root";
+      const main = document.querySelector("main") || document.body;
+      main.appendChild(root);
+    }
+    root.classList.add("jammy-schedule-root");
+
+    // Sections container
+    const wrap = el("div", { class: "jammy-wrap" });
+
+    // --- Overview
+    const chipsHtml = DATA.titleChips.map(c => `<span class="jammy-chip" role="listitem">${esc(c)}</span>`).join("");
+    const overview = el("section", { class: "jammy-section", id: "overview", "aria-labelledby": "overview-title" }, `
+      <div class="jammy-head">
+        <div>
+          <p class="jammy-eyebrow">Schedule</p>
+          <h2 class="jammy-h2" id="overview-title">JAMMY CON weekend at a glance</h2>
+          <p class="jammy-lede">Browse the full schedule by day and area.</p>
+        </div>
+        <div class="jammy-chips" role="list" aria-label="Quick highlights">${chipsHtml}</div>
+      </div>
+      <div class="jammy-grid-12 jammy-glance"></div>
+    `);
+
+    const glanceGrid = overview.querySelector(".jammy-glance");
+    DATA.atAGlance.forEach(item => {
+      const meta = item.meta.map((m, i) => `
+        <div class="jammy-meta" style="${i === 0 ? "border-top:0;padding-top:0" : ""}">
+          <span class="jammy-meta-k">${esc(m.k)}</span>
+          <span class="jammy-meta-v">${esc(m.v)}</span>
+        </div>
+      `).join("");
+      const card = el("article", { class: "jammy-card jammy-card-glow jammy-span-12" }, `
+        <div class="jammy-card-top">
+          <div class="jammy-badge">${esc(item.badge)}</div>
+          <h3 class="jammy-h3">${esc(item.title)}</h3>
+          <p class="jammy-muted">${esc(item.desc)}</p>
+        </div>
+        <div class="jammy-card-meta">${meta}</div>
+      `);
+      glanceGrid.appendChild(card);
+    });
+
+    // --- Venue Areas
+    const venue = el("section", { class: "jammy-section", id: "venue", "aria-labelledby": "venue-title" }, `
+      <div class="jammy-head">
+        <div>
+          <p class="jammy-eyebrow">Venue areas</p>
+          <h2 class="jammy-h2" id="venue-title">Where things happen</h2>
+          <p class="jammy-lede">Use these areas to filter the schedule instantly.</p>
+        </div>
+      </div>
+      <div class="jammy-grid-12 jammy-areas"></div>
+    `);
+
+    const areasGrid = venue.querySelector(".jammy-areas");
+    const areaMap = [
+      { key: "event", title: DATA.areas[0].title, desc: DATA.areas[0].desc, icon: ICONS.event },
+      { key: "arena", title: DATA.areas[1].title, desc: DATA.areas[1].desc, icon: ICONS.arena },
+      { key: "legacy", title: DATA.areas[2].title, desc: DATA.areas[2].desc, icon: ICONS.legacy }
+    ];
+    areaMap.forEach(a => {
+      const card = el("article", { class: "jammy-card jammy-area-card jammy-span-12" }, `
+        <div class="jammy-icon">${a.icon}</div>
+        <h3 class="jammy-h3">${esc(a.title)}</h3>
+        <p class="jammy-muted">${esc(a.desc)}</p>
+      `);
+      areasGrid.appendChild(card);
+    });
+
+    // --- Schedule
+    const schedule = el("section", { class: "jammy-section", id: "schedule", "aria-labelledby": "schedule-title" }, `
+      <div class="jammy-head">
+        <div>
+          <p class="jammy-eyebrow">Full schedule</p>
+          <h2 class="jammy-h2" id="schedule-title">Browse by day</h2>
+          <p class="jammy-lede">Pick a day, then filter by area.</p>
+        </div>
+        <div class="jammy-toolbar" role="group" aria-label="Schedule filters">
+          <button class="jammy-btn jammy-active" data-day="sat" type="button">Saturday</button>
+          <button class="jammy-btn" data-day="sun" type="button">Sunday</button>
+          <span class="jammy-divider" aria-hidden="true"></span>
+          <button class="jammy-pill jammy-active" data-area="all" type="button">All Areas</button>
+          <button class="jammy-pill" data-area="arena" type="button">Arena B</button>
+          <button class="jammy-pill" data-area="event" type="button">Event Centre</button>
+          <button class="jammy-pill" data-area="legacy" type="button">Legacy Room</button>
+        </div>
+      </div>
+
+      <div class="jammy-schedule-days"></div>
+
+      <div class="jammy-actions">
+        <a class="jammy-linkbtn" href="#jammy-details">View event details</a>
+      </div>
+    `);
+
+    const daysWrap = schedule.querySelector(".jammy-schedule-days");
+
+    const buildDay = (dayKey, title) => {
+      const dayEl = el("div", { class: "jammy-day", dataset: { day: dayKey } }, `
+        <div class="jammy-grid-12 jammy-schedgrid"></div>
+      `);
+
+      const grid = dayEl.querySelector(".jammy-schedgrid");
+      DATA.schedule[dayKey].forEach(block => {
+        const slots = block.slots.map(s => `
+          <div class="jammy-slot">
+            <span class="jammy-time">${esc(s.time)}</span>
+            <span class="jammy-name">${esc(s.name)}</span>
+            <span class="jammy-tag">${esc(s.tag)}</span>
+          </div>
+        `).join("");
+
+        const card = el("article", {
+          class: "jammy-card jammy-schedule-card jammy-span-12",
+          dataset: { area: block.area }
+        }, `
+          <h3 class="jammy-h3">${esc(block.title)}</h3>
+          <p class="jammy-muted">${esc(block.subtitle)}</p>
+          <div class="jammy-timeline" role="list">${slots}</div>
+        `);
+        grid.appendChild(card);
+      });
+
+      return dayEl;
+    };
+
+    const satDay = buildDay("sat", "Saturday");
+    const sunDay = buildDay("sun", "Sunday");
+    sunDay.classList.add("jammy-hidden");
+    daysWrap.appendChild(satDay);
+    daysWrap.appendChild(sunDay);
+
+    // --- Event Details
+    const details = el("section", { class: "jammy-section", id: "jammy-details", "aria-labelledby": "details-title" }, `
+      <div class="jammy-head">
+        <div>
+          <p class="jammy-eyebrow">Event details</p>
+          <h2 class="jammy-h2" id="details-title">Tap to expand</h2>
+          <p class="jammy-lede">Short descriptions for the most asked-about programs.</p>
+        </div>
+      </div>
+      <div class="jammy-accordion" data-accordion></div>
+    `);
+
+    const acc = details.querySelector("[data-accordion]");
+    DATA.details.forEach((d, idx) => {
+      const item = el("div", { class: "jammy-acc" }, `
+        <button class="jammy-acc-btn" type="button" aria-expanded="false">
+          <span class="jammy-acc-title">${esc(d.title)}</span>
+          <span class="jammy-acc-sub">${esc(d.sub)}</span>
+          <span class="jammy-acc-ico" aria-hidden="true">+</span>
+        </button>
+        <div class="jammy-acc-panel" hidden>
+          <p>${esc(d.body)}</p>
+        </div>
+      `);
+      acc.appendChild(item);
+    });
+
+    wrap.appendChild(overview);
+    wrap.appendChild(venue);
+    wrap.appendChild(schedule);
+    wrap.appendChild(details);
+
+    // Clear & inject
+    root.innerHTML = "";
+    root.appendChild(wrap);
+
+    // Interactions
+    wire(root);
+  };
+
+  const wire = (root) => {
+    const dayBtns = [...root.querySelectorAll(".jammy-btn[data-day]")];
+    const areaBtns = [...root.querySelectorAll(".jammy-pill[data-area]")];
+    const days = [...root.querySelectorAll(".jammy-day[data-day]")];
+    const eventCentrePill = root.querySelector('.jammy-pill[data-area="event"]');
+
+    let activeDay = "sat";
+    let activeArea = "all";
+
+    const setActive = (btns, activeBtn) => {
+      btns.forEach(b => b.classList.toggle("jammy-active", b === activeBtn));
+    };
+
+    const apply = () => {
+      days.forEach(dayEl => {
+        const isDay = dayEl.dataset.day === activeDay;
+        dayEl.classList.toggle("jammy-hidden", !isDay);
+        if (!isDay) return;
+
+        const cards = [...dayEl.querySelectorAll(".jammy-schedule-card[data-area]")];
+        cards.forEach(card => {
+          const match = activeArea === "all" || card.dataset.area === activeArea;
+          card.style.display = match ? "" : "none";
+        });
+      });
+    };
+
+    const updateAreaPillVisibility = () => {
+      if (eventCentrePill) {
+        eventCentrePill.classList.toggle("jammy-hidden", activeDay === "sun");
+      }
+      if (activeDay === "sun" && activeArea === "event") {
+        activeArea = "all";
+        const allBtn = areaBtns.find(b => b.dataset.area === "all");
+        if (allBtn) setActive(areaBtns, allBtn);
+      }
+    };
+
+    dayBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeDay = btn.dataset.day;
+        setActive(dayBtns, btn);
+        updateAreaPillVisibility();
+        apply();
+      });
+    });
+
+    areaBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeArea = btn.dataset.area;
+        setActive(areaBtns, btn);
+        apply();
+      });
+    });
+
+    // Accordion
+    root.querySelectorAll(".jammy-acc").forEach(item => {
+      const btn = item.querySelector(".jammy-acc-btn");
+      const panel = item.querySelector(".jammy-acc-panel");
+      const ico = item.querySelector(".jammy-acc-ico");
+      btn.addEventListener("click", () => {
+        const expanded = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!expanded));
+        panel.hidden = expanded;
+        if (ico) ico.textContent = expanded ? "+" : "–";
+      });
+    });
+
+    // Initial render
+    apply();
+  };
+
+  const boot = () => {
+    injectCSS();
+    build();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>

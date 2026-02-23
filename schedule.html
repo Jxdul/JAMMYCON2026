@@ -75,10 +75,10 @@
     },
     details: [
       { title: "Random Play Dance", sub: "Audition Saturday · Public Sunday", body: "Jump in, follow the choreo, and vibe with the crowd. Saturday includes auditions; Sunday is open/public." },
-      { title: "Cosplay Showcase", sub: "Festival highlight block", body: "Show off your cosplay and enjoy a high-energy showcase. Lineup may shift based on programming." },
-      { title: "Fansign Event", sub: "Limited participation", body: "Limited participation. Please check the schedule above for requirements and updates." },
+      { title: "Cosplay Showcase", sub: "Festival highlight block", body: "Show off your cosplay and enjoy a high-energy showcase!" },
+      { title: "Fansign Event", sub: "Limited participation", body: "Limited participation. Please check our Instagram for requirements and updates." },
       { title: "Game Zone & Photocard Zone", sub: "Drop in anytime", body: "Games, trading, decorating, and community hangouts throughout festival hours." },
-      { title: "Workshops (Legacy Room)", sub: "Smaller sessions", body: "Workshops and special programming in a quieter space. Perfect for learning and creator-style sessions." }
+      { title: "Workshops (Legacy Room)", sub: "Smaller sessions", body: "Workshops and special programming. Perfect for learning and creator-style sessions." }
     ]
   };
 
@@ -453,6 +453,7 @@
           <button class="jammy-pill" data-area="arena" type="button">Arena B</button>
           <button class="jammy-pill" data-area="event" type="button">Event Centre</button>
           <button class="jammy-pill" data-area="legacy" type="button">Legacy Room</button>
+          <button class="jammy-pill" data-area="arena" type="button">Arena B</button>
         </div>
       </div>
 
@@ -545,6 +546,7 @@
     const areaBtns = [...root.querySelectorAll(".jammy-pill[data-area]")];
     const days = [...root.querySelectorAll(".jammy-day[data-day]")];
     const eventCentrePill = root.querySelector('.jammy-pill[data-area="event"]');
+    const legacyRoomPill = root.querySelector('.jammy-pill[data-area="legacy"]');
 
     let activeDay = "sat";
     let activeArea = "all";
@@ -571,7 +573,15 @@
       if (eventCentrePill) {
         eventCentrePill.classList.toggle("jammy-hidden", activeDay === "sun");
       }
+      if (legacyRoomPill) {
+        legacyRoomPill.classList.toggle("jammy-hidden", activeDay === "sat");
+      }
       if (activeDay === "sun" && activeArea === "event") {
+        activeArea = "all";
+        const allBtn = areaBtns.find(b => b.dataset.area === "all");
+        if (allBtn) setActive(areaBtns, allBtn);
+      }
+      if (activeDay === "sat" && activeArea === "legacy") {
         activeArea = "all";
         const allBtn = areaBtns.find(b => b.dataset.area === "all");
         if (allBtn) setActive(areaBtns, allBtn);
@@ -609,6 +619,7 @@
     });
 
     // Initial render
+    updateAreaPillVisibility();
     apply();
   };
 

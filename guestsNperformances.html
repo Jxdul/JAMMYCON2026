@@ -1,0 +1,205 @@
+<div id="jammy-guests-root"></div>
+
+<script>
+(() => {
+  const DATA = {
+    titleChips: ["Artists", "Special Guests", "Main Stage", "WinSport Event Centre"],
+    atAGlance: [
+      { badge: "Main Stage", title: "Headline Artists", desc: "Concert programming and featured performances.", meta: [{ k: "When", v: "Saturday night · Event Centre" }] },
+      { badge: "Meet & Greet", alt: true, title: "Signings & Photos", desc: "Limited meet & greet and fansign opportunities.", meta: [{ k: "Details", v: "Check Instagram for updates" }] },
+      { badge: "Special Guests", title: "Workshops & Panels", desc: "K-Beauty, fashion, dance workshops and more.", meta: [{ k: "Where", v: "Legacy Room" }] },
+      { badge: "Cover Dance", alt: true, title: "Contest & Showcase", desc: "Auditions Saturday; public random play Sunday.", meta: [{ k: "Stage", v: "Arena B · Legacy" }] }
+    ]
+  };
+
+  const CSS = `
+  :root{
+    --bg0:#070812; --bg1:#0b0d1a;
+    --card: rgba(255,255,255,.06);
+    --stroke: rgba(255,255,255,.12);
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.68);
+    --shadow: 0 18px 60px rgba(0,0,0,.40);
+    --shadow2: 0 10px 30px rgba(0,0,0,.34);
+    --r: 22px; --r2: 18px;
+    --pad: clamp(18px, 2.2vw, 26px);
+    --max: 1120px;
+    --a1: 255, 80, 230;  /* pink */
+    --a2: 80, 200, 255;  /* blue */
+    --a3: 120, 255, 180; /* green */
+  }
+
+  #jammy-guests-root, .jammy-guests-root{
+    background:
+      radial-gradient(1000px 600px at 20% -10%, rgba(var(--a2),.25), transparent 60%),
+      radial-gradient(900px 560px at 110% 10%, rgba(var(--a1),.22), transparent 55%),
+      radial-gradient(900px 560px at 50% 110%, rgba(var(--a3),.12), transparent 55%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    color: var(--text);
+    border-radius: 26px;
+    overflow: hidden;
+  }
+
+  .jammy-section{
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: clamp(34px, 5vw, 64px) var(--pad);
+  }
+
+  .jammy-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap: 18px; margin-bottom: 18px;
+  }
+
+  .jammy-eyebrow{
+    letter-spacing: .18em; text-transform: uppercase;
+    font-size: .72rem; color: rgba(255,255,255,.62);
+    margin: 0 0 6px 0;
+  }
+
+  .jammy-h2{
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    line-height: 1.08; margin: 0;
+  }
+
+  .jammy-h3{ font-size: 1.12rem; margin: 0 0 6px 0; }
+  .jammy-lede{ margin: 10px 0 0 0; color: var(--muted); max-width: 60ch; }
+  .jammy-muted{ color: var(--muted); }
+
+  .jammy-chips{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap: 10px; }
+  .jammy-chip{
+    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,.05);
+    padding: 9px 12px; border-radius: 999px;
+    font-size: .86rem; backdrop-filter: blur(10px);
+  }
+
+  .jammy-grid-12{ display:grid; gap: 14px; grid-template-columns: repeat(12, 1fr); }
+  .jammy-span-12{ grid-column: span 12; }
+
+  .jammy-card{
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+    border-radius: var(--r);
+    box-shadow: var(--shadow2);
+    overflow:hidden;
+  }
+
+  .jammy-card-glow{ position:relative; }
+  .jammy-card-glow::before{
+    content:""; position:absolute; inset:-1px;
+    background:
+      radial-gradient(420px 220px at 20% 10%, rgba(var(--a2),.24), transparent 60%),
+      radial-gradient(420px 220px at 90% 10%, rgba(var(--a1),.22), transparent 60%);
+    opacity:.55; pointer-events:none;
+  }
+
+  .jammy-card-top{ position:relative; padding: 18px 18px 0 18px; }
+  .jammy-card-meta{ position:relative; padding: 14px 18px 18px 18px; display:grid; gap: 10px; }
+
+  .jammy-badge{
+    display:inline-flex; align-items:center; gap: 8px;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.06);
+    padding: 6px 10px; border-radius: 999px;
+    font-size: .82rem; margin-bottom: 10px; width: fit-content;
+  }
+
+  .jammy-meta{
+    display:flex; justify-content:space-between; gap: 12px;
+    border-top: 1px dashed rgba(255,255,255,.12);
+    padding-top: 10px;
+  }
+  .jammy-meta:first-child{ border-top: 0; padding-top: 0; }
+  .jammy-meta-k{ color: rgba(255,255,255,.62); }
+  .jammy-meta-v{ color: rgba(255,255,255,.90); font-weight: 600; }
+
+  /* Responsive upgrades */
+  @media (min-width: 780px){
+    .jammy-glance > article{ grid-column: span 6; }
+  }
+  `;
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const el = (tag, attrs = {}, html = "") => {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v === null || v === undefined) continue;
+      if (k === "class") node.className = v;
+      else if (k === "dataset") Object.entries(v).forEach(([dk, dv]) => (node.dataset[dk] = dv));
+      else node.setAttribute(k, v);
+    }
+    node.innerHTML = html;
+    return node;
+  };
+
+  const injectCSS = () => {
+    const id = "jammy-guests-css";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = CSS;
+    document.head.appendChild(style);
+  };
+
+  const build = () => {
+    let root = document.getElementById("jammy-guests-root");
+    if (!root) {
+      root = document.createElement("div");
+      root.className = "jammy-guests-root";
+      const main = document.querySelector("main") || document.body;
+      main.appendChild(root);
+    }
+    root.classList.add("jammy-guests-root");
+
+    const wrap = el("div", { class: "jammy-wrap" });
+
+    const chipsHtml = DATA.titleChips.map(c => `<span class="jammy-chip" role="listitem">${esc(c)}</span>`).join("");
+    const overview = el("section", { class: "jammy-section", id: "overview", "aria-labelledby": "overview-title" }, `
+      <div class="jammy-head">
+        <div>
+          <p class="jammy-eyebrow">Guests &amp; Performances</p>
+          <h2 class="jammy-h2" id="overview-title">Artists and special guests at JAMMY CON</h2>
+          <p class="jammy-lede">Who's performing and who you can meet.</p>
+        </div>
+        <div class="jammy-chips" role="list" aria-label="Quick highlights">${chipsHtml}</div>
+      </div>
+      <div class="jammy-grid-12 jammy-glance"></div>
+    `);
+
+    const glanceGrid = overview.querySelector(".jammy-glance");
+    DATA.atAGlance.forEach(item => {
+      const meta = item.meta.map((m, i) => `
+        <div class="jammy-meta" style="${i === 0 ? "border-top:0;padding-top:0" : ""}">
+          <span class="jammy-meta-k">${esc(m.k)}</span>
+          <span class="jammy-meta-v">${esc(m.v)}</span>
+        </div>
+      `).join("");
+      const card = el("article", { class: "jammy-card jammy-card-glow jammy-span-12" }, `
+        <div class="jammy-card-top">
+          <div class="jammy-badge">${esc(item.badge)}</div>
+          <h3 class="jammy-h3">${esc(item.title)}</h3>
+          <p class="jammy-muted">${esc(item.desc)}</p>
+        </div>
+        <div class="jammy-card-meta">${meta}</div>
+      `);
+      glanceGrid.appendChild(card);
+    });
+
+    wrap.appendChild(overview);
+    root.innerHTML = "";
+    root.appendChild(wrap);
+  };
+
+  const boot = () => {
+    injectCSS();
+    build();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>
